@@ -1,0 +1,94 @@
+- hosts: "masters, workers"
+  remote_user: kube
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+     - name: Create containerd config file
+       file:
+         path: "/etc/modules-load.d/containerd.conf"
+         state: "touch"
+
+     - name: Add conf for containerd
+       blockinfile:
+         path: "/etc/modules-load.d/containerd.conf"
+         block: |
+               overlay
+               br_netfilter
+
+     - name: modprobe
+       shell: |
+               sudo modprobe overlay
+               sudo modprobe br_netfilter
+
+
+     - name: Set system configurations for Kubernetes networking
+       file:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         state: "touch"
+
+     - name: Add conf for containerd
+       blockinfile:
+         path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+         block: |
+                net.bridge.bridge-nf-call-iptables = 1
+                net.ipv4.ip_forward = 1
+                net.bridge.bridge-nf-call-ip6tables = 1
+
+     - name: Apply new settings
+       command: sudo sysctl --system
+
+    #  - name: install containerd
+    #    shell: |
+    #            sudo yum update && sudo yum install -y containerd
+    #            sudo mkdir -p /etc/containerd
+    #            sudo containerd config default | sudo tee /etc/containerd/config.toml
+    #            sudo systemctl restart containerd
+
+     - name: disable swap
+       shell: |
+               sudo swapoff -a
+               sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+               
+     - name: Adding kubernetes repo
+       shell:
+         cmd: |
+              cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+              [kubernetes]
+              name=Kubernetes
+              baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+              enabled=1
+              gpgcheck=1
+              gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+              exclude=kubelet kubeadm kubectl
+              EOF
+       args:
+         executable: /bin/bash
+
+     - name: installing docker.service
+       shell: |
+              sudo yum update -y
+              sudo yum search docker
+              sudo yum install docker -y 
+
+
+     - name: running docker.service
+       shell: |
+              sudo usermod -a -G docker ec2-user
+              id ec2-user
+              sudo systemctl enable docker.service
+              sudo systemctl start docker.service
+              sudo systemctl restart docker
+              sudo systemctl status docker.service
+
+     - name: install kubernetes
+       shell: |
+               sudo yum update
+               sudo setenforce 0
+               sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+               sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+               sudo systemctl enable --now kubelet
+               

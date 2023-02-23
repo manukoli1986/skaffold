@@ -91,7 +91,6 @@ depends_on = [aws_instance.k8master]
       echo "master ansible_host=${aws_instance.k8master.public_ip} ansible_user=ec2-user ansible_ssh_common_args='"-o StrictHostKeyChecking=no"' ansible_ssh_private_key_file=~/Downloads/mayank-macos.pem" >> ../ansible/hosts
       echo [workers] >> ../ansible/hosts
       echo "worker1 ansible_host=${aws_instance.k8worker.0.public_ip} ansible_user=ec2-user ansible_ssh_common_args='"-o StrictHostKeyChecking=no"' ansible_ssh_private_key_file=~/Downloads/mayank-macos.pem" >> ../ansible/hosts
-      echo "worker2 ansible_host=${aws_instance.k8worker.1.public_ip} ansible_user=ec2-user ansible_ssh_common_args='"-o StrictHostKeyChecking=no"' ansible_ssh_private_key_file=~/Downloads/mayank-macos.pem" >> ../ansible/hosts
     EOT
   }
 }

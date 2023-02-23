@@ -1,0 +1,18 @@
+- hosts: "masters"
+  remote_user: kube
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+     - name: install Linkered
+       shell: |
+                curl https://run.linkerd.io/install | sh
+                ~/.linkerd2/bin/linkerd version
+                export PATH=$PATH:$HOME/.linkerd2/bin
+                linkerd install
+                linkerd install --crd | kubectl apply -f -
+                linkerd install | kubectl apply -f -
+                linkerd check

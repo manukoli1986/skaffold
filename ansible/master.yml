@@ -42,3 +42,9 @@
     - name: Copy join command to local file.
       become: false
       local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
+
+    - name: install Helm
+      shell: |
+              wget -O helm.tar.gz https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz
+              tar -zxvf helm.tar.gz
+              sudo mv linux-amd64/helm /usr/local/bin/helm

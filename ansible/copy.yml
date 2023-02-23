@@ -1,0 +1,11 @@
+- hosts: master
+  become: yes
+  gather_facts: yes
+
+  tasks:
+   - name: Copy command from Ansible host to the master node
+     become: yes
+     copy:
+       src: ../k8-manifests
+       dest: /tmp/
+       mode: 0777

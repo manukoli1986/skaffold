@@ -52,7 +52,7 @@ resource "aws_instance" "k8master" {
 
 #### Worker Node
 resource "aws_instance" "k8worker" {
-  count = 2
+  count = 1
   tags = {
     Name = "Worker-${count.index}",
     Cluster = "K8s-Cluster" 

@@ -22,12 +22,12 @@ gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 exclude=kubelet kubeadm kubectl
 EOF
 
-sudo yum install java-1.8.0-openjdk.x86_64
+#sudo yum install java-1.8.0-openjdk.x86_64
 
 sudo setenforce 0
 sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo yum install -y git kubelet kubeadm kubectl --disableexcludes=kubernetes
 
 
 sudo systemctl enable --now kubelet

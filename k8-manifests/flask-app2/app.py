@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Importing module of flask framework to run app on web
-from flask import Flask, render_template
+from flask import Flask
 import datetime
 
 
@@ -11,8 +11,8 @@ app = Flask(__name__)
 # Displays the index page accessible at '/'
 @app.route("/")
 def index():
-    print ("Hello World !!! - v2")
-    return "This is second deployment. Kindly use /image uri to get output"
+    return ("Hello World !!! - v2")
+    
 
 
 # This code is finish and ready to server on port 80
